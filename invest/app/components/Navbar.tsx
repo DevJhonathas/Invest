@@ -6,14 +6,14 @@ import Link from "next/link";
 const navItems = [
   { label: "Início", href: "/" },
   { label: "Cotações", href: "/pages/search" },
-  { label: "Minha carteira", href: "/carteira" },
+  { label: "Minha carteira", href: "/pages/wallet" },
 ];
 
 function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Sincroniza com o tema salvo ou preferência do sistema ao carregar
+
   useEffect(() => {
     setMounted(true);
     const dark =
@@ -32,7 +32,6 @@ function ThemeToggle() {
     localStorage.theme = newTheme ? "dark" : "light";
   }
 
-  // Evita inconsistência visual (hydration mismatch) antes de montar no cliente
   if (!mounted) {
     return <div className="h-10 w-10 shrink-0" />;
   }
@@ -46,7 +45,6 @@ function ThemeToggle() {
       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
     >
       {isDark ? (
-        /* Ícone de sol (modo escuro ativo, clica para ir ao claro) */
         <svg
           width="20"
           height="20"
@@ -62,7 +60,6 @@ function ThemeToggle() {
           <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42 1.42m11.3-11.3 1.42-1.42" />
         </svg>
       ) : (
-        /* Ícone de lua (modo claro ativo, clica para ir ao escuro) */
         <svg
           width="20"
           height="20"
@@ -116,7 +113,6 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* DESKTOP NAVIGATION */}
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
@@ -129,7 +125,6 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* DESKTOP ACTIONS */}
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
           <Link
@@ -147,7 +142,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* MOBILE ACTIONS */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
@@ -189,7 +183,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE DROPDOWN */}
       <div
         id="mobile-menu"
         aria-hidden={!menuOpen}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   lang="pt-BR"
   suppressHydrationWarning
 >
-  <body>
+  <body className="vsc-initialized">
       <Navbar />
       {children}
   </body>
