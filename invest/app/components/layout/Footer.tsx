@@ -1,5 +1,15 @@
+// "use client";
+
 import Link from "next/link";
-import CurrentYear from "./currentYear";
+// import CurrentYear from "./currentYear";
+import { Suspense } from "react";
+import { connection } from "next/server";
+
+async function CurrentYear() {
+  await connection();
+
+  return <span>{new Date().getFullYear()}</span>;
+}
 
 export default function Footer(){
   return(
@@ -14,7 +24,17 @@ export default function Footer(){
             Acompanhe seus investimentos com mais clareza.
           </p>
           <p className="text-xs text-slate-400 dark:text-slate-400">
-            {/* © <CurrentYear/> Invest. Todos os direitos reservados. */}
+            ©{" "}
+            <Suspense
+              fallback={
+                <span className="invisible" aria-hidden="true">
+                  2026
+                </span>
+              }
+            >
+              <CurrentYear />
+            </Suspense>{" "}
+            Invest. Todos os direitos reservados.
           </p>
         </div>
         <div className="border-t border-slate-100 dark:border-slate-800 px-5 py-4 text-center">

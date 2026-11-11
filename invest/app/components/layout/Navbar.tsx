@@ -1,39 +1,100 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore, useState } from "react";
 import Link from "next/link";
 
 const navItems = [
   { label: "Início", href: "/" },
   { label: "Cotações", href: "/pages/search" },
   { label: "Minha carteira", href: "/pages/wallet" },
+  { label: "Sobre", href: "/pages/about" },
+  //  { label: "Feedback", href: "/pages/feedback" },
 ];
 
-function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+const accountItems = [
+  {
+    label: "Entrar",
+    href: "/pages/login",
+    variant: "secondary",
+  },
+  {
+    label: "Criar conta",
+    href: "/pages/cadastro",
+    variant: "primary",
+  },
+];
 
+type Theme = "dark" | "light";
 
-  useEffect(() => {
-    setMounted(true);
-    const dark =
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+const THEME_CHANGE_EVENT = "invest-theme-change";
 
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-  }, []);
+function getThemeSnapshot(): Theme | null {
+  if (typeof window === "undefined") return null;
 
-  function toggleTheme() {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme);
-    localStorage.theme = newTheme ? "dark" : "light";
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark" || savedTheme === "light") {
+    return savedTheme;
   }
 
-  if (!mounted) {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function getServerThemeSnapshot(): Theme | null {
+  return null;
+}
+
+function subscribeToTheme(onStoreChange: () => void) {
+  const updateTheme = () => {
+    const theme = getThemeSnapshot();
+
+    if (theme) {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    }
+
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", updateTheme);
+  window.addEventListener(THEME_CHANGE_EVENT, updateTheme);
+
+  const currentTheme = getThemeSnapshot();
+
+  if (currentTheme) {
+    document.documentElement.classList.toggle(
+      "dark",
+      currentTheme === "dark"
+    );
+  }
+
+  return () => {
+    window.removeEventListener("storage", updateTheme);
+    window.removeEventListener(THEME_CHANGE_EVENT, updateTheme);
+  };
+}
+
+
+
+function ThemeToggle() {
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot
+  );
+
+  if (theme === null) {
     return <div className="h-10 w-10 shrink-0" />;
+  }
+
+  const isDark = theme === "dark";
+
+  function toggleTheme() {
+    const newTheme = isDark ? "light" : "dark";
+
+    localStorage.setItem("theme", newTheme);
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }
 
   return (
@@ -77,6 +138,7 @@ function ThemeToggle() {
     </button>
   );
 }
+
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -127,19 +189,20 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Entrar
-          </Link>
 
-          <Link
-            href="/cadastro"
-            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
-          >
-            Criar conta
-          </Link>
+          {accountItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={
+                item.variant === "primary"
+                  ? "rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+                  : "rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+              }
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -206,23 +269,19 @@ export default function Navbar() {
           ))}
 
           <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+            {accountItems.map((item) => (
             <Link
-              href="/login"
-              onClick={closeMenu}
-              tabIndex={menuOpen ? 0 : -1}
-              className="rounded-lg px-3 py-3 text-center text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
+              key={item.href}
+              href={item.href}
+              className={
+                item.variant === "primary"
+                  ? "rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+                  : "rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+              }
             >
-              Entrar
+              {item.label}
             </Link>
-
-            <Link
-              href="/cadastro"
-              onClick={closeMenu}
-              tabIndex={menuOpen ? 0 : -1}
-              className="rounded-lg bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
-            >
-              Criar conta
-            </Link>
+              ))}
           </div>
         </nav>
       </div>

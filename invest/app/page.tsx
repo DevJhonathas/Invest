@@ -1,6 +1,5 @@
 
 import Link from "next/link";
-import Footer from "./components/Footer";
 export default function Home() {
     return (
     <div className="min-h-screen bg-[#f8faf9] text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
@@ -271,7 +270,5 @@ export default function Home() {
           </div>
         </section>
       </main>
-      {/* FOOTER */}
-      <Footer />
     </div>);
 }

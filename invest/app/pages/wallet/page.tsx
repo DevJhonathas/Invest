@@ -6,6 +6,8 @@ import type { FormEvent, ReactNode } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
+import Link from "next/link";
+import { assets } from "@/app/data/assets";
 
 registerLocale("pt-BR", ptBR);
 
@@ -42,7 +44,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import Footer from "@/app/components/Footer";
+import Footer from "@/app/components/layout/Footer";
 
 type AssetType = "Ação" | "FII" | "ETF" | "BDR";
 type OperationType = "Compra" | "Venda";
@@ -842,6 +844,9 @@ export default function WalletPage() {
 
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredHoldings.map((item) => {
+                  const assetDetails = assets.find(
+                    (asset) => asset.ticker.toUpperCase() === item.ticker.toUpperCase()
+                  );
                   const currentValue = item.quantity * item.currentPrice;
                   const investedValue = item.quantity * item.averagePrice;
                   const result = currentValue - investedValue;
@@ -860,17 +865,30 @@ export default function WalletPage() {
                       {/* ATIVO */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                            {item.ticker.slice(0, 2)}
-                          </div>
 
-                          <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                              {item.ticker}
-                            </p>
-                            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                              {item.name} · {item.type}
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                              {item.ticker.slice(0, 2)}
+                            </div>
+
+                            <div>
+                              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                {assetDetails ? (
+                                  <Link
+                                    href={`/pages/search/${assetDetails.slug}`}
+                                    className="rounded-sm transition-colors hover:text-emerald-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:text-emerald-400"
+                                  >
+                                    {item.ticker}
+                                  </Link>
+                                ) : (
+                                  item.ticker
+                                )}
+                              </p>
+
+                              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                {item.name} · {item.type}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -1319,7 +1337,6 @@ export default function WalletPage() {
           </div>
         </div>
       )}
-      <Footer />
     </main>
   );
 }
