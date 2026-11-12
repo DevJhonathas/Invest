@@ -4,6 +4,13 @@ Plataforma de acompanhamento de investimentos voltada inicialmente ao mercado fi
 
 > **Status:** em desenvolvimento. A primeira etapa contempla a construção do frontend. Backend, banco de dados, integração com provedores de cotações e autenticação real serão implementados posteriormente.
 
+
+<p align="center">
+<img width="48%" src="https://github.com/user-attachments/assets/5b929471-2c22-4203-9883-25f3be5c88e0" />
+<img width="48%" src="https://github.com/user-attachments/assets/747ebbea-c126-4bd0-bdb4-e630dbf20975" />
+</p>
+
+
 ## Objetivo do projeto
 
 O Invest. pretende ajudar o usuário a acompanhar seus investimentos sem precisar monitorar cada ativo manualmente durante todo o dia.
